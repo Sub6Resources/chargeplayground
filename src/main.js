@@ -1,4 +1,4 @@
-const fovy = Math.PI/2.5;
+const fovy = Math.PI/4;
 const near_culling = 0.0;
 const far_culling = 100.0;
 
@@ -34,7 +34,7 @@ async function initWebGL() {
 
     // Set the view matrix (camera position)
     const camera = new Camera();
-    camera.setPosition(2.0, 1.5, 3.0);
+    camera.setPosition(3.0, 2.5, 4.0);
     camera.setForward(-1.0, -1.0, -1.0);
     camera.setUp(0.0, 1.0, 0.0);
     camera.getViewMatrix(viewMatrix);
@@ -57,19 +57,10 @@ async function initWebGL() {
         gl.bufferSubData(gl.UNIFORM_BUFFER, 3 * 16 * 4, normalMatrix);
     }
 
-    // Set GL options
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LEQUAL);
-
     let scene = new Scene(gl);
+    scene.addCompute(new PhysicsComputer(gl));
     scene.add(new Walls(gl));
-    scene.add(new Charge(gl, new glMatrix.vec3.fromValues(0.0, 0.0, 1.0), new glMatrix.vec3.fromValues(0.0, 0.0, 0.0), 1.0, 0.0));
-    scene.add(new Charge(gl, new glMatrix.vec3.fromValues(0.0, 1.0, 0.0), new glMatrix.vec3.fromValues(0.0, 0.0, 0.0), 1.0, 0.0));
-    scene.add(new Charge(gl, new glMatrix.vec3.fromValues(1.0, 0.0, 0.5), new glMatrix.vec3.fromValues(0.0, 0.0, 0.0), -1.0, 0.0));
-    scene.add(new Charge(gl, new glMatrix.vec3.fromValues(1.0, 1.0, 0.7), new glMatrix.vec3.fromValues(0.0, 0.0, 0.0), 1.0, 0.0));
-    scene.add(new Charge(gl, new glMatrix.vec3.fromValues(0.5, 0.7, 1.0), new glMatrix.vec3.fromValues(0.0, 0.0, 0.0), -1.0, 0.0));
+    scene.add(new ChargeStream(gl));
     await scene.compile(gl);
 
     // Rendering loop
@@ -88,11 +79,8 @@ async function initWebGL() {
 
         updateMatrices();
 
-        // Clear the screen (color and depth buffer)
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
         // Render the scene
-        scene.render(gl, time);
+        scene.render(gl, time, canvas.width, canvas.height);
 
         requestAnimationFrame(render);
     }
