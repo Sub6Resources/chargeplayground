@@ -4,14 +4,13 @@ precision mediump float;
 in vec2 index;
 
 uniform sampler2D memory;
+uniform vec3 Efield;
+uniform vec3 Bfield;
+uniform float Q;
+uniform float M;
+uniform float v_0;
 
 out vec4 fragColor;
-
-const vec3 EField = vec3(0.0, 0.0, 0.0);
-const vec3 BField = vec3(-1.0, 0.0, 0.0);
-const float Q = 0.01;
-const float M = 10.0;
-const float v_0 = -0.01;
 
 // Decode vec4 as a 32-bit float
 float decodeFloatRGBA(vec4 color) {
@@ -102,8 +101,8 @@ void main() {
     float currDZFloat = decodeFloatRGBA(curr_dz);
 
     highp vec3 v = vec3(currDXFloat, currDYFloat, currDZFloat);
-    highp vec3 vxB = cross(v, BField);
-    highp vec3 acc = (EField + vxB) * Q / M;
+    highp vec3 vxB = cross(v, Bfield);
+    highp vec3 acc = (Efield + vxB) * Q / M;
 
     float newX = currXFloat + currDXFloat;
     float newY = currYFloat + currDYFloat;
@@ -121,7 +120,7 @@ void main() {
             memorySample = encodeFloat(newY);
         }
     } else if (offset == 2u) {
-        if (newX > 2.0 || newX <= 0.0 || newY > 2.0 || newY <= 0.0 || newZ > 3.0 || newZ <= 0.0) {
+        if (newX > 2.0 || newX <= 0.0 || newY > 2.0 || newY <= 0.0 || newZ > 4.0 || newZ <= 0.0) {
             newZ = 3.0;
         }
         memorySample = encodeFloat(newZ);
@@ -129,19 +128,19 @@ void main() {
         if (newX > 2.0 || newX <= 0.0 || newY > 2.0 || newY <= 0.0 || newZ > 4.0 || newZ <= 0.0) {
             memorySample = encodeFloat(0.0);
         } else {
-            memorySample = encodeFloat(currDXFloat + acc.x);
+            memorySample = encodeFloat(currDXFloat + acc.x*1e-3);
         }
     } else if (offset == 4u) {
         if (newX > 2.0 || newX <= 0.0 || newY > 2.0 || newY <= 0.0 || newZ > 4.0 || newZ <= 0.0) {
             memorySample = encodeFloat(0.0);
         } else {
-            memorySample = encodeFloat(currDYFloat + acc.y);
+            memorySample = encodeFloat(currDYFloat + acc.y*1e-3);
         }
     } else if (offset == 5u) {
         if (newX > 2.0 || newX <= 0.0 || newY > 2.0 || newY <= 0.0 || newZ > 4.0 || newZ <= 0.0) {
             memorySample = encodeFloat(v_0);
         } else {
-            memorySample = encodeFloat(currDZFloat + acc.z);
+            memorySample = encodeFloat(currDZFloat + acc.z*1e-3);
         }
     }
 

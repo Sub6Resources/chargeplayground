@@ -2,6 +2,7 @@ const fovy = Math.PI/4;
 const near_culling = 0.0;
 const far_culling = 100.0;
 
+let paused = false;
 
 async function initWebGL() {
     const canvas = document.getElementById('webgl-canvas');
@@ -58,7 +59,8 @@ async function initWebGL() {
     }
 
     let scene = new Scene(gl);
-    scene.addCompute(new PhysicsComputer(gl));
+    const physics = new PhysicsComputer(gl);
+    scene.addCompute(physics);
     scene.add(new Walls(gl));
     scene.add(new ChargeStream(gl));
     await scene.compile(gl);
@@ -82,7 +84,9 @@ async function initWebGL() {
         // Render the scene
         scene.render(gl, time, canvas.width, canvas.height);
 
-        requestAnimationFrame(render);
+        if(!paused) {
+            requestAnimationFrame(render);
+        }
     }
 
     requestAnimationFrame(render);
@@ -137,6 +141,55 @@ async function initWebGL() {
         updateMatrices();
     });
 
+    const Ex_input = document.getElementById("ex");
+    const Ey_input = document.getElementById("ey");
+    const Ez_input = document.getElementById("ez");
+    const Bx_input = document.getElementById("bx");
+    const By_input = document.getElementById("by");
+    const Bz_input = document.getElementById("bz");
+    const Q_input = document.getElementById("q");
+    const M_input = document.getElementById("m");
+    const vz_input = document.getElementById("vz");
+    const submit = document.getElementById("submit");
+    const reset = document.getElementById("reset");
+    const pause_button = document.getElementById("pause");
+
+    Ex_input.value = physics.Ex;
+    Ey_input.value = physics.Ey;
+    Ez_input.value = physics.Ez;
+    Bx_input.value = physics.Bx;
+    By_input.value = physics.By;
+    Bz_input.value = physics.Bz;
+    Q_input.value = physics.Q;
+    M_input.value = physics.M;
+    vz_input.value = physics.v_0;
+
+    submit.onclick = function() {
+        physics.Ex = parseFloat(Ex_input.value);
+        physics.Ey = parseFloat(Ey_input.value);
+        physics.Ez = parseFloat(Ez_input.value);
+        physics.Bx = parseFloat(Bx_input.value);
+        physics.By = parseFloat(By_input.value);
+        physics.Bz = parseFloat(Bz_input.value);
+        physics.Q = parseFloat(Q_input.value);
+        physics.M = parseFloat(M_input.value);
+        physics.v_0 = parseFloat(vz_input.value);
+    }
+
+    reset.onclick = function() {
+        physics.resetParticles(gl);
+        if (paused) {
+            requestAnimationFrame(render);
+        }
+    }
+
+    pause_button.onclick = function() {
+        paused = !paused;
+        if(!paused) {
+            requestAnimationFrame(render);
+        }
+        pause_button.innerText = paused ? "Resume": "Pause";
+    }
 
     return canvas;
 }

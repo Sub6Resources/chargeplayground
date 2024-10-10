@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Charge Playground</title>
+    <title>Cathode Ray Playground</title>
     <script src="src/lib/gl-matrix.js"></script>
     <script src="src/obj/shaders/loader.js"></script>
     <script src="src/obj/scene.js"></script>
@@ -17,7 +17,15 @@
 <body>
     <canvas id="webgl-canvas" width="100" height="100"></canvas>
     <div id="fps"> fps</div>
-    <div id="pos"> charges</div>
+    <div id="pos">
+        <b>Controls</b><br />
+        E field: x: <input type="number" id="ex" value="0"> y: <input type="number" id="ey" value="0"> z: <input type="number" id="ez" value="0"><br />
+        B field: x: <input type="number" id="bx" value="0"> y: <input type="number" id="by" value="0"> z: <input type="number" id="bz" value="0"><br />
+        Charge: <input type="number" id="q" value="0"><br />
+        Mass: <input type="number" id="m" value="0"><br />
+        Initial Velocity: z: <input type="number" id="vz" value="0"><br />
+        <button id="submit">Update</button><button id="pause">Pause</button><button id="reset">Reset</button>
+    </div>
     <script src="src/main.js"></script>
 </body>
 </html>
