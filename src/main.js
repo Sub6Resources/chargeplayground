@@ -150,8 +150,8 @@ async function initWebGL() {
     const Q_input = document.getElementById("q");
     const M_input = document.getElementById("m");
     const vz_input = document.getElementById("vz");
-    const submit = document.getElementById("submit");
     const reset = document.getElementById("reset");
+    const resetParams = document.getElementById("reset2");
     const pause_button = document.getElementById("pause");
 
     Ex_input.value = physics.Ex;
@@ -164,7 +164,7 @@ async function initWebGL() {
     M_input.value = physics.M;
     vz_input.value = physics.v_0;
 
-    submit.onclick = function() {
+    let update = function() {
         physics.Ex = parseFloat(Ex_input.value);
         physics.Ey = parseFloat(Ey_input.value);
         physics.Ez = parseFloat(Ez_input.value);
@@ -176,8 +176,35 @@ async function initWebGL() {
         physics.v_0 = parseFloat(vz_input.value);
     }
 
+    Ex_input.onchange = update;
+    Ey_input.onchange = update;
+    Ez_input.onchange = update;
+    Bx_input.onchange = update;
+    By_input.onchange = update;
+    Bz_input.onchange = update;
+    Q_input.onchange = update;
+    M_input.onchange = update;
+    vz_input.onchange = update;
+
     reset.onclick = function() {
         physics.resetParticles(gl);
+        if (paused) {
+            requestAnimationFrame(render);
+        }
+    }
+
+    resetParams.onclick = function() {
+        Ex_input.value = 0;
+        Ey_input.value = 0;
+        Ez_input.value = 0;
+        Bx_input.value = -1;
+        By_input.value = 0;
+        Bz_input.value = 0;
+        Q_input.value = 1;
+        M_input.value = 1;
+        vz_input.value = -0.01;
+        physics.resetParticles(gl);
+        update();
         if (paused) {
             requestAnimationFrame(render);
         }
